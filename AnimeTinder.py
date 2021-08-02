@@ -3,18 +3,24 @@ import shutil
 import os
 from PIL import ImageTk, Image
 
+#creates window
 top = tkinter.Tk()
 canvas = tkinter.Canvas(top, width = 0, height = 0)
 canvas.pack()
 
-filepath = "C:\\Users\\Receptionist\\IdeaProjects\\Anti-Anime-Automata\\pfp\\"
+#filepath is where it pulls from (must end in\\) while the other three locations are where it places them
+filepath = os.getcwd()+"\\pfp\\pfp\\"
+animeFilePath = os.getcwd()+"\\pfp\\pfp-anime"
+notAnimeFilePath = os.getcwd()+"\\pfp\\pfp-not-anime"
+cartoonFilePath =os.getcwd()+"\\pfp\\cartoon"
+
+#pulls the first image from filepath and places it into a panel on the window
 pic = os.listdir(filepath)[0]
 img = ImageTk.PhotoImage(Image.open(filepath + pic))
 panel = tkinter.Label(top, image = img)
 panel.pack(side = "bottom", fill = "both", expand = "yes")
 
 def anime (event):
-    animeFilePath = "C:\\Users\\Receptionist\\IdeaProjects\\Anti-Anime-Automata\\pfp-anime"
     print("anime")
 
     shutil.move(filepath+os.listdir(filepath)[0],animeFilePath)
@@ -29,7 +35,6 @@ def anime (event):
     panel.pack(side = "bottom", fill = "both", expand = "yes")
 
 def notanime (event):
-    notAnimeFilePath = "C:\\Users\\Receptionist\\IdeaProjects\\Anti-Anime-Automata\\pfp-not-anime"
     print("notanime")
 
     shutil.move(filepath+os.listdir(filepath)[0],notAnimeFilePath)
@@ -44,7 +49,7 @@ def notanime (event):
     panel.pack(side = "bottom", fill = "both", expand = "yes")
 
 def cartoon (event):
-    cartoonFilePath = "C:\\Users\\Receptionist\\IdeaProjects\\Anti-Anime-Automata\\pfp-cartoon"
+
     print("cartoon")
 
     shutil.move(filepath+os.listdir(filepath)[0],cartoonFilePath)

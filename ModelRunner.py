@@ -1,17 +1,18 @@
 from imageai.Classification.Custom import CustomImageClassification
+import os
+
+filepath = os.getcwd()
 
 detector = CustomImageClassification()
 detector.setModelTypeAsInceptionV3()
 
-detector.setModelPath("C:\\Users\\endri\\Desktop\\Git\\AAA\\Anime2\\models\\model_ex-074_acc-0.994175.h5")
-detector.setJsonPath("C:\\Users\\endri\\Desktop\\Git\\AAA\\Anime2\\json\\model_class.json")
+detector.setModelPath(filepath + "\\Anime3\\models\\model_ex-073_acc-0.996815.h5")
+detector.setJsonPath(filepath+ "\\Anime3\\json\\model_class.json")
 
-detector.loadModel(num_objects=3)
+detector.loadModel(num_objects=2)
 
-#print(detector.classifyImage("C:\\Users\\endri\\Desktop\\Git\\AAA\\pfp-anime\\Solo34071115.jpg"))
+predictions, probabilities = detector.classifyImage(filepath + "\\pfp\\pfp\\i.png", result_count=2)
 
-predictions, probabilities = detector.classifyImage("C:\\Users\\endri\\Desktop\\Git\\AAA\\pfp\\original (3).jpg", result_count=3)
-
-print("HELP")
+print("results:")
 for eachPrediction, eachProbability in zip(predictions, probabilities):
     print(eachPrediction , " : " , eachProbability)

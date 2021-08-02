@@ -4,6 +4,7 @@ import twitter
 import requests
 import shutil
 import time
+import os
 
 apiKey = ''
 apiKeySecret = ''
@@ -16,7 +17,7 @@ api = twitter.Api(consumer_key=apiKey,
                   access_token_secret=accessTokenSecret)
 # Funimation, DisneyXD, kianamaiart
 user = "Crunchyroll"
-filepath = "C:\\Users\\Receptionist\\IdeaProjects\\Anti-Anime-Automata\\pfp"
+filepath = os.getcwd()+"\\pfp\\pfp"
 print("Get follow list from:"+user)
 
 print(time.ctime())
@@ -47,17 +48,7 @@ while (cursorIteration < cursorMax):
             print ("Downloaded twitter avatar to", filename)
         del response
 
-
-    #try:
-    #print(time.ctime())
-    #time.sleep(1150)
-    #u2List = api.GetFollowers(screen_name = user, cursor=nextCursor)
-    #nextCursor = u2List[0]
     print(nextCursor)
-    #uList = u2List[2]
-    #seconds = time.time()
-    #except:
-     #   break
     cursorIteration =+ 1
     if nextCursor == 0:
         break
