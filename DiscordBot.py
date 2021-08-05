@@ -67,19 +67,28 @@ async def on_message(message):
 async def check(ctx,*users):
 
     #all I feel is pain, so much PAIN
+    #combines all arguments into a single thing to search
+    #solves the issue of searching for a user with a space in the name
     t = ""
     for r in users:
         t = t + str(r) + " "
     t = t[:-1]
     print("COMPLETED:"+t)
+
+    #this checks if what was enter was an @. when someone puts an @ it sends it to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
+    #<@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
+    if (t[:3] == "<@!" and t[-1] == ">"):
+        t = t[3:-1]
+        print(t)
     if(users):
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
-                    print(t)
-                    print(user)
-                    print(member.name)
-                    if(str(member.name) == str(user)) or (str(member) == str(user)) or (t == str(member.name) or (t == str(member))):
+                    #print(t)
+                    #print(user)
+                    #print(member.name)
+                    #print(member.id)
+                    if(str(member.name) == str(user)) or (str(member) == str(user)) or (t == str(member.name) or (t == str(member)) or t == str(member.id)) or t == str(member.nick):
                         print("FOUND")
                         if(checkForAnimePFP(member)):
                             await ctx.send(member.name + " appears to have an anime profile picture. \n\nthey should fix that.")
@@ -126,6 +135,7 @@ async def analyze(ctx, link):
     await ctx.send(words)
 
 @client.command(pass_context=True)
+@commands.has_permissions(ban_members=True)
 async def aggression(ctx, number):
     global aggresion
 
@@ -151,6 +161,7 @@ async def aggression(ctx, number):
     return
 
 @client.command(pass_context=True)
+@commands.has_permissions(administrator=True)
 async def enablewhitelist(ctx, value):
     global enableWhitelist
     if value == "True":
@@ -167,22 +178,75 @@ async def enablewhitelist(ctx, value):
 
 
 @client.command(pass_context=True)
-async def whitelist(ctx, user):
-    for guild in client.guilds:
-        for member in guild.members:
-            print(member)
-    return
+@commands.has_permissions(ban_members=True)
+async def whitelist(ctx, *users):
+    global whitelistusers
+    t = ""
+    for r in users:
+        t = t + str(r) + " "
+    t = t[:-1]
+    #print("COMPLETED:"+t)
+
+    #this checks if what was enter was an @. when someone puts an @ it sends it to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
+    #<@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
+    if (t[:3] == "<@!" and t[-1] == ">"):
+        t = t[3:-1]
+        print(t)
+    if(users):
+        for user in users:
+            for guild in client.guilds:
+                for member in guild.members:
+                    if(str(member.name) == str(user)) or (str(member) == str(user)) or (t == str(member.name) or (t == str(member)) or t == str(member.id)):
+                        for x in whitelistusers:
+                            if x == member.id:
+                                await ctx.send(member.name + " is already whitelisted")
+                                return
+                        whitelistusers.append(member.id)
+                        print(member.name + "(" + str(member.id)+") has been added to the whitelist")
+                        await ctx.send(member.name + " has been added to the whitelist")
+                        with open(whitelistLocation, 'w') as outfile:
+                            json.dump(whitelistusers, outfile)
+                        return
+    await ctx.send("Could not find user to add to whitelist")
 
 @client.command(pass_context=True)
-async def unwhitelist(ctx, user):
-    pass
+@commands.has_permissions(ban_members=True)
+async def unwhitelist(ctx, *users):
+    global whitelistusers
+    t = ""
+    for r in users:
+        t = t + str(r) + " "
+    t = t[:-1]
+    #print("COMPLETED:"+t)
+
+    #this checks if what was enter was an @. when someone puts an @ it sends it to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
+    #<@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
+    if (t[:3] == "<@!" and t[-1] == ">"):
+        t = t[3:-1]
+        print(t)
+    if(users):
+        for user in users:
+            for guild in client.guilds:
+                for member in guild.members:
+                    if(str(member.name) == str(user)) or (str(member) == str(user)) or (t == str(member.name) or (t == str(member)) or t == str(member.id)):
+                        for x in whitelistusers:
+                            if (x == member.id):
+                                whitelistusers.remove(x)
+                                await ctx.send(member.name + " has been removed from the whitelist")
+                                print(member.name + "(" + str(member.id)+") has been removed from the whitelist")
+                                with open(whitelistLocation, 'w') as outfile:
+                                    json.dump(whitelistusers, outfile)
+                                return
+                        await ctx.send(member.name + " is not on the whitelist")
+                        return
+    await ctx.send("Could not find user to remove from whitelist")
 
 @client.command(pass_context=True)
 async def whitelistlist(ctx):
     global whitelistusers
-    listof = ""
+    listof = "**Whitelist**\n"
     for x in whitelistusers:
-        listof = listof + x + "\n"
+        listof = listof + str(client.get_user(x).name) + "\n"
 
     await ctx.send(listof)
     return
@@ -234,9 +298,9 @@ def onWhitelist(testUser):
         return False
 
     global whitelistusers
-    print ("checking on whitelist")
     for x in whitelistusers:
-        if x == testUser:
+        if x == testUser.id:
+            print(testUser.name + " is on the whitelist")
             return True
     return False
 
