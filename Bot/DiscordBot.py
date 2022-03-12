@@ -1,22 +1,23 @@
 from imageai.Classification.Custom import CustomImageClassification
 from discord.utils import get
+from pathlib import Path
 import requests
 import shutil
-import os
 import json
 import discord
 
 from discord.ext import commands
 
-filepath = os.getcwd()
-jsonLocation = filepath + "\\BotConfig.json"
-whitelistLocation = filepath + "\\Whitelist.json"
+filepath = Path()
+jsonLocation = filepath / "BotConfig.json"
+whitelistLocation = filepath / "Whitelist.json"
+keyLocation = filepath / "key.txt"
 
 detector = CustomImageClassification()
 detector.setModelTypeAsInceptionV3()
 
-detector.setModelPath(filepath + "\\model_ex-073_acc-0.996815.h5")
-detector.setJsonPath(filepath + "/model_class.json")
+detector.setModelPath(filepath / "model_ex-073_acc-0.996815.h5")
+detector.setJsonPath(filepath / "model_class.json")
 detector.loadModel(num_objects=2)
 
 config = json.load(open(jsonLocation))
@@ -55,18 +56,18 @@ async def on_message(message):
             not (aggresion == "0") and \
             not onWhitelist(message.author) and \
             (checkForAnimePFP(message.author)):
-        if (aggresion == "1"):
+        if aggresion == "1":
             await message.channel.send("BANNED")
-        if (aggresion == "2"):
+        if aggresion == "2":
             print(message.channel)
-            if (message.channel != "anime-quarantine"):
+            if message.channel != "anime-quarantine":
                 await message.channel.send(str(message.author) + " has been quarantined")
                 role = get(message.guild.roles, name="Anime PFP")
                 await message.author.add_roles(role)
-        if (aggresion == "3"):
+        if aggresion == "3":
             await message.channel.send("Kicked :3")
             await message.author.kick(reason="Anime PFP")
-        if (aggresion == "4"):
+        if aggresion == "4":
             await message.channel.send(str(message.author) + ": BANNED")
             await message.author.ban(reason="Anime PFP")
 
@@ -86,31 +87,32 @@ async def check(ctx, *users):
     # <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
     # <@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is
     # you cannot overload methods. So I must live in jank
-    if (t[:3] == "<@!" and t[-1] == ">"):
+    if t[:3] == "<@!" and t[-1] == ">":
         t = t[3:-1]
         print(t)
-    if (users):
+    if users:
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
+                    if str(member.name) != str(user) and str(member) != str(user) and t != str(
+                            member.name) and t != str(member) and t != str(member.id) and t != str(
+                            member.nick):
+                        continue
                     # print(t)
                     # print(user)
                     # print(member.name)
                     # print(member.id)
-                    if (str(member.name) == str(user)) or (str(member) == str(user)) or (
-                            t == str(member.name) or (t == str(member)) or t == str(member.id)) or t == str(
-                            member.nick):
-                        print("FOUND")
-                        if (checkForAnimePFP(member)):
-                            await ctx.send(
-                                member.name + " appears to have an anime profile picture. \n\nthey should fix that.")
-                        else:
-                            await ctx.send(member.name + " does not appear to have an Anime Profile Picture")
-                        return
+                    print("FOUND")
+                    if checkForAnimePFP(member):
+                        await ctx.send(
+                            member.name + " appears to have an anime profile picture. \n\nthey should fix that.")
+                    else:
+                        await ctx.send(member.name + " does not appear to have an Anime Profile Picture")
+                    return
             await ctx.send("could not find " + "".join(users))
             return
 
-    if (checkForAnimePFP(ctx.message.author)):
+    if checkForAnimePFP(ctx.message.author):
         await ctx.send("you appear to have an anime profile picture. \n\nyou should fix that.")
     else:
         await ctx.send("you do not appear to have an Anime Profile Picture")
@@ -136,33 +138,34 @@ async def bancheck(ctx, *users):
     # to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
     # <@! and ends with >. Is this the worse way to do it? probably. an issue with the commands
     # is you cannot overload methods. So I must live in jank
-    if (t[:3] == "<@!" and t[-1] == ">"):
+    if t[:3] == "<@!" and t[-1] == ">":
         t = t[3:-1]
         print(t)
-    if (users):
+    if users:
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
+                    if str(member.name) != str(user) and str(member) != str(user) and t != str(
+                            member.name) and t != str(member) and t != str(member.id) and t != str(
+                            member.nick):
+                        continue
                     # print(t)
                     # print(user)
                     # print(member.name)
                     # print(member.id)
-                    if (str(member.name) == str(user)) or (str(member) == str(user)) or (
-                            t == str(member.name) or (t == str(member)) or t == str(member.id)) or t == str(
-                            member.nick):
-                        print("FOUND")
-                        if (checkForAnimePFP(member)):
-                            await ctx.send(
-                                member.name + " appears to have an anime profile picture. and will be banned.")
-                            await ctx.guild.ban(member, reason="Anime PFP")
-                        else:
-                            await ctx.send(
-                                member.name + " does not appear to have an Anime Profile Picture and will bot be banned")
-                        return
+                    print("FOUND")
+                    if checkForAnimePFP(member):
+                        await ctx.send(
+                            member.name + " appears to have an anime profile picture. and will be banned.")
+                        await ctx.guild.ban(member, reason="Anime PFP")
+                    else:
+                        await ctx.send(
+                            member.name + " does not appear to have an Anime Profile Picture and will bot be banned")
+                    return
             await ctx.send("could not find " + "".join(users))
             return
 
-    if (checkForAnimePFP(ctx.message.author)):
+    if checkForAnimePFP(ctx.message.author):
         await ctx.send("you appear to have an anime profile picture. \n\nyou should fix that.")
     else:
         await ctx.send("you do not appear to have an Anime Profile Picture")
@@ -172,7 +175,7 @@ async def bancheck(ctx, *users):
 async def checkall(ctx):
     for guild in client.guilds:
         for member in guild.members:
-            if (checkForAnimePFP(member)):
+            if checkForAnimePFP(member):
                 await ctx.send(member.name + " has an Anime Profile Picture")
 
     return
@@ -182,7 +185,7 @@ async def checkall(ctx):
 async def analyze(ctx, *link):
     words = "Analysis of"
 
-    if (ctx.message.attachments):
+    if ctx.message.attachments:
         aLink = ctx.message.attachments[0].url
         words = words + " attachment"
     else:
@@ -191,7 +194,7 @@ async def analyze(ctx, *link):
     # tries to download a picture from the internet, if it can't it responds no image found and returns
     try:
         response = requests.get(aLink, stream=True)
-        filename = filepath + "\\analyze.jpg"
+        filename = filepath / "analyze.jpg"
 
         with open(filename, 'wb') as img:
             shutil.copyfileobj(response.raw, img)
@@ -277,12 +280,13 @@ async def whitelist(ctx, *users):
     t = t[:-1]
     # print("COMPLETED:"+t)
 
-    # this checks if what was enter was an @. when someone puts an @ it sends it to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
-    # <@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
-    if (t[:3] == "<@!" and t[-1] == ">"):
+    # this checks if what was enter was an @. when someone puts an @ it sends it to this method as
+    # <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting <@! and ends with >. Is this the worse way
+    # to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
+    if t[:3] == "<@!" and t[-1] == ">":
         t = t[3:-1]
         print(t)
-    if (users):
+    if users:
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
@@ -311,12 +315,13 @@ async def unwhitelist(ctx, *users):
     t = t[:-1]
     # print("COMPLETED:"+t)
 
-    # this checks if what was enter was an @. when someone puts an @ it sends it to this method as <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting
-    # <@! and ends with >. Is this the worse way to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
-    if (t[:3] == "<@!" and t[-1] == ">"):
+    # this checks if what was enter was an @. when someone puts an @ it sends it to this method as
+    # <@!xxxxxxxxxxxxxxxxxx> so it detects when a search has the starting <@! and ends with >. Is this the worse way
+    # to do it? probably. an issue with the commands is you cannot overload methods. So I must live in jank
+    if t[:3] == "<@!" and t[-1] == ">":
         t = t[3:-1]
         print(t)
-    if (users):
+    if users:
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
@@ -372,7 +377,7 @@ def checkForAnimePFP(testUser):
 
     response = requests.get(link, stream=True)
 
-    filename = filepath + "\\test.jpg"
+    filename = filepath / "test.jpg"
 
     with open(filename, 'wb') as img:
         shutil.copyfileobj(response.raw, img)
@@ -384,7 +389,7 @@ def checkForAnimePFP(testUser):
     print("results for:" + testUser.name)
     for eachPrediction, eachProbability in zip(predictions, probabilities):
         print(eachPrediction, " : ", eachProbability)
-        if (eachPrediction == "anime" and eachProbability > 60):
+        if eachPrediction == "anime" and eachProbability > 60:
             return True
     return False
 
@@ -401,4 +406,6 @@ def onWhitelist(testUser):
     return False
 
 
-client.run('NDU3MjIwOTU0NDQ4NDYxODI2.WyPqMg.6MstvWPZt1NzcuM6cmtOkOkYS5k')
+with open(keyLocation) as k:
+    key = k.readline()
+client.run(str(key))
