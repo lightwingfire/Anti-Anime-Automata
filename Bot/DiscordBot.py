@@ -3,6 +3,7 @@ from discord.utils import get
 from pathlib import Path
 import requests
 import shutil
+import os
 import json
 import discord
 
@@ -94,21 +95,20 @@ async def check(ctx, *users):
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
-                    if str(member.name) != str(user) and str(member) != str(user) and t != str(
-                            member.name) and t != str(member) and t != str(member.id) and t != str(
-                            member.nick):
-                        continue
                     # print(t)
                     # print(user)
                     # print(member.name)
                     # print(member.id)
-                    print("FOUND")
-                    if checkForAnimePFP(member):
-                        await ctx.send(
-                            member.name + " appears to have an anime profile picture. \n\nthey should fix that.")
-                    else:
-                        await ctx.send(member.name + " does not appear to have an Anime Profile Picture")
-                    return
+                    if (str(member.name) == str(user)) or (str(member) == str(user)) or (
+                            t == str(member.name) or (t == str(member)) or t == str(member.id)) or t == str(
+                        member.nick):
+                        print("FOUND")
+                        if checkForAnimePFP(member):
+                            await ctx.send(
+                                member.name + " appears to have an anime profile picture. \n\nthey should fix that.")
+                        else:
+                            await ctx.send(member.name + " does not appear to have an Anime Profile Picture")
+                        return
             await ctx.send("could not find " + "".join(users))
             return
 
@@ -145,23 +145,22 @@ async def bancheck(ctx, *users):
         for user in users:
             for guild in client.guilds:
                 for member in guild.members:
-                    if str(member.name) != str(user) and str(member) != str(user) and t != str(
-                            member.name) and t != str(member) and t != str(member.id) and t != str(
-                            member.nick):
-                        continue
                     # print(t)
                     # print(user)
                     # print(member.name)
                     # print(member.id)
-                    print("FOUND")
-                    if checkForAnimePFP(member):
-                        await ctx.send(
-                            member.name + " appears to have an anime profile picture. and will be banned.")
-                        await ctx.guild.ban(member, reason="Anime PFP")
-                    else:
-                        await ctx.send(
-                            member.name + " does not appear to have an Anime Profile Picture and will bot be banned")
-                    return
+                    if (str(member.name) == str(user)) or (str(member) == str(user)) or (
+                            t == str(member.name) or (t == str(member)) or t == str(member.id)) or t == str(
+                        member.nick):
+                        print("FOUND")
+                        if checkForAnimePFP(member):
+                            await ctx.send(
+                                member.name + " appears to have an anime profile picture. and will be banned.")
+                            await ctx.guild.ban(member, reason="Anime PFP")
+                        else:
+                            await ctx.send(
+                                member.name + " does not appear to have an Anime Profile Picture and will bot be banned")
+                        return
             await ctx.send("could not find " + "".join(users))
             return
 
@@ -389,7 +388,7 @@ def checkForAnimePFP(testUser):
     print("results for:" + testUser.name)
     for eachPrediction, eachProbability in zip(predictions, probabilities):
         print(eachPrediction, " : ", eachProbability)
-        if eachPrediction == "anime" and eachProbability > 60:
+        if (eachPrediction == "anime" and eachProbability > 60):
             return True
     return False
 
